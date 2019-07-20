@@ -14,7 +14,7 @@
 #
 # Author: Jackson Lopes <jacksonlopes@gmail.com>
 # URL: https://jslabs.cc
-# Info/Source: 
+# src: https://github.com/jacksonlopes/ckac
 
 # Dependências:
 # binutils, curl, bc
