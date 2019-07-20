@@ -17,18 +17,22 @@
 # Info/Source: 
 
 # Dependências:
-# binutils, curl
+# binutils, curl, bc
+dep=(curl bc)
 
 function validar_ambiente() {
    [ ! -f ckac.conf ] && {
      echo "Erro: Arquivo 'ckac.conf' não encontrado."
      exit 1
    }
-   which curl 1>/dev/null
-   [ $? != 0 ] && {
-      echo "Erro: curl não encontrado..."
-      exit 1
-   }
+   
+   for d in ${dep[*]}; do
+      which $d 1>/dev/null
+      [ $? != 0 ] && {
+        echo "Erro: $d não encontrado..."
+        exit 1
+      }   
+   done
 }
 
 source ckac.conf
@@ -90,7 +94,7 @@ function calcular_apresentar_acoes() {
   #https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion
   url="URL_"$1
   [ "${!url}" == "" ] && {
-     echo "* Papel '$1' não existente no arquivo 'ckAcao.conf'"
+     echo "* Papel '$1' não existente no arquivo 'ckac.conf'"
      return
   }
 
