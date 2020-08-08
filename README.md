@@ -52,3 +52,13 @@ Para obter o código do ativo:
 **Exemplo de output**
 
 ![Output:](https://i.pstorage.space/i/wK2PelAe0/original_01.png)
+
+**Cotação simulada**
+
+Para simular o valor de um papel, processa conforme instruções abaixo:
+
+./ckac.sh "AÇÃO" "VALOR"
+
+Ex:
+
+./ckac.sh petr4 12.44

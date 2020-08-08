@@ -13,14 +13,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Author: Jackson Lopes <jacksonlopes@gmail.com>
-# URL: https://jslabs.cc
-# src: https://github.com/jacksonlopes/ckac
+# URL: https://jlopes.net
 
 # Dependências:
 # binutils, curl, bc
 dep=(curl bc)
+simulacao_acao=""
+simulacao_valor=0
 
-function validar_ambiente() {
+function verificar_parametros() {
+    [ "$1" != "" -a "$2" = "" ] && {
+        echo "Erro: Para a simulação da cotação é necessário informar <AÇÃO> <VALOR>."
+        echo "ex.: $0 petr4 10.55"
+        exit 1
+    }
+    simulacao_acao=`echo $1 | tr '[a-z]' '[A-Z]'`
+    simulacao_valor=$2
+}
+
+function validar_ambiente()
+{
    [ ! -f ckac.conf ] && {
      echo "Erro: Arquivo 'ckac.conf' não encontrado."
      exit 1
@@ -38,12 +50,14 @@ function validar_ambiente() {
 source ckac.conf
 retorno=""
 
-function obter_cotacao() {
+function obter_cotacao()
+{
   local cotacao=`curl -s $1 | grep 'data-role="currentvalue"' | cut -d'>' -f2- | cut -d'<' -f1`
   echo $cotacao | tr ',' '.'  
 }
 
-function calcular_valores() {
+function calcular_valores()
+{
 
     local total_somatorio_compra=0
     local total_somatorio_atual=0
@@ -80,7 +94,8 @@ function calcular_valores() {
     retorno="$total_somatorio_compra;$total_somatorio_atual;$total_acoes"
 }
 
-function imprimir_final() {
+function imprimir_final()
+{
   diferenca=$(bc <<< "$2 - $1")
   echo "================="
   echo "NÚM. AÇÕES: $3"
@@ -89,8 +104,9 @@ function imprimir_final() {
   printf "DIFERENÇA: %15s\n" "$diferenca"  
 }
 
-function calcular_apresentar_acoes() {
-
+function calcular_apresentar_acoes()
+{
+  local cotacao=""
   #https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion
   url="URL_"$1
   [ "${!url}" == "" ] && {
@@ -102,7 +118,16 @@ function calcular_apresentar_acoes() {
   v=$(eval echo "\${${1}[*]}")
 
   local url=`echo ${URI_PRINCIPAL}${url_buscar}`
-  local cotacao=`obter_cotacao $url`
+
+  if [ "$1" = "$simulacao_acao" ]; then
+      echo -e "\e[1m+----------------------------------\e[0m"
+      echo -e "\e[1m| Valor simulado: $simulacao_valor\e[0m"
+      echo -e "\e[1m+----------------------------------\e[0m"
+      cotacao=$simulacao_valor
+  else
+      cotacao=`obter_cotacao $url`
+  fi
+
   local total_somatorio_compra=0
   local total_somatorio_atual=0
   local total_acoes=0
@@ -120,11 +145,13 @@ function calcular_apresentar_acoes() {
   echo ""
 }
 
-main() {
+main()
+{
+  verificar_parametros $*
   validar_ambiente
   for V in `grep "URL_" ckac.conf | grep "=" | cut -d'_' -f2 | cut -d'=' -f1`; do
      calcular_apresentar_acoes "$V"
   done
 }
 
-main
+main $*
