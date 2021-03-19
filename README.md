@@ -3,7 +3,7 @@ Shell script para gerar um relatório simples com informações sobre ganho/perd
 
 **Formato do arquivo de configuração**
 
-	URL_<ATIVO>="código do ativo da URI" 
+	URL_<ATIVO>="código do ativo da URI"
 	<ATIVO>=(
 		<NÚMERO AÇÕES>:<PREÇO COMPRA>
 		<NÚMERO AÇÕES>:<PREÇO COMPRA>
@@ -11,13 +11,9 @@ Shell script para gerar um relatório simples com informações sobre ganho/perd
 
 Para obter o código do ativo:
 
-01 - Acesse o link da URI_PRINCIPAL
+01 - A url é composta por URI_PRINCIPAL + AÇÃO
 
-02 - Escolha um papel
-
-03 - Recorte o trecho na url que corresponda após a string 'stockdetails' e anterior ao '?'
-
-04 - Adicione os dados no arquivo de configuração no formato apresentado acima.
+02 - Adicione os dados no arquivo de configuração. Siga o exemplo abaixo.
 
 **Obs.: O script automaticamente identifica o novo papel e gera as informações pertinentes.**
 
@@ -26,22 +22,22 @@ Para obter o código do ativo:
 **Exemplo: ckac.conf**
 
 ----
-	URI_PRINCIPAL="https://www.msn.com/pt-br/dinheiro/stockdetails/"
+	URI_PRINCIPAL="https://statusinvest.com.br/acoes/"
 
-	URL_VALE3="bsp-vale3/fi-apnjsm" 
+	URL_VALE3="vale3"
 	VALE3=(
 		2500:15.30
 		900:40.70
 	)
 
-	URL_PETR4="bsp-petr4/fi-apn4gh"
+	URL_PETR4="petr4"
 	PETR4=(
 		100:19.70
 		800:55
 		300:15.40
 	)
 
-	URL_SLCE3="bsp-slce3/fi-apncjc"
+	URL_SLCE3="slce3"
 	SLCE3=(
 		500:10.10
 		800:22.60

@@ -13,7 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Author: Jackson Lopes <jacksonlopes@gmail.com>
-# URL: https://jlopes.net
+# URL: https://stdsrc.net
 
 # Dependências:
 # binutils, curl, bc
@@ -37,13 +37,13 @@ function validar_ambiente()
      echo "Erro: Arquivo 'ckac.conf' não encontrado."
      exit 1
    }
-   
+
    for d in ${dep[*]}; do
       which $d 1>/dev/null
       [ $? != 0 ] && {
         echo "Erro: $d não encontrado..."
         exit 1
-      }   
+      }
    done
 }
 
@@ -52,8 +52,8 @@ retorno=""
 
 function obter_cotacao()
 {
-  local cotacao=`curl -s $1 | grep 'data-role="currentvalue"' | cut -d'>' -f2- | cut -d'<' -f1`
-  echo $cotacao | tr ',' '.'  
+  local cotacao=`curl -s $1 | grep 'strong class="value"' | head -1 | cut -d'<' -f2 | cut -d'>' -f2`
+  echo $cotacao | tr ',' '.'
 }
 
 function calcular_valores()
@@ -65,30 +65,30 @@ function calcular_valores()
 
     qtde=`echo $4 | cut -d':' -f1`
     vl_compra=`echo $4 | cut -d':' -f2`
-    total_compra=$(bc <<< "$qtde * $vl_compra")    
-    total_atual=$(bc <<< "$qtde * $cotacao")        
-    
+    total_compra=$(bc <<< "$qtde * $vl_compra")
+    total_atual=$(bc <<< "$qtde * $cotacao")
+
     total_somatorio_compra=$(bc <<< "$1 + $total_compra")
     total_somatorio_atual=$(bc <<< "$2 + $total_atual")
-    total_acoes=$(bc <<< "$3 + $qtde")    
-    
+    total_acoes=$(bc <<< "$3 + $qtde")
+
     somatorio=$(bc <<< "$total_atual - $total_compra")
-    
+
     echo $somatorio | grep "-" 1>/dev/null
     if [ $? != 0  ]; then
        imp_str="GANHO DE $somatorio"
     else
        somatorio=$(bc <<< "$somatorio * -1")
        imp_str="==> PERDA DE $somatorio"
-    fi    
-    
-    # ( valor_inicial - valor_final ) / valor_inicial * 100        
-    perc=`echo "scale=2; ($total_compra - $total_atual) / $total_compra * 100" | bc`    
+    fi
+
+    # ( valor_inicial - valor_final ) / valor_inicial * 100
+    perc=`echo "scale=2; ($total_compra - $total_atual) / $total_compra * 100" | bc`
     echo $perc | grep "-" 1>/dev/null
     [ $? = 0 ] && {
        perc=$(bc <<< "$perc * -1")
-    }    
-    
+    }
+
     printf "QTDE: %-5s | VL_COMPRA: %-5s == %-9s | COTAÇÃO: %-5s == %-9s | %-20s | %% %s\n" "$qtde" "$vl_compra" "$total_compra" "$cotacao" "$total_atual" "$imp_str" "$perc"
     perc=0
     retorno="$total_somatorio_compra;$total_somatorio_atual;$total_acoes"
@@ -101,7 +101,7 @@ function imprimir_final()
   echo "NÚM. AÇÕES: $3"
   printf "TOTAL INVESTIDO: %9s\n" "$1"
   printf "TOTAL ATUAL: %13s\n" "$2"
-  printf "DIFERENÇA: %15s\n" "$diferenca"  
+  printf "DIFERENÇA: %15s\n" "$diferenca"
 }
 
 function calcular_apresentar_acoes()
@@ -133,15 +133,15 @@ function calcular_apresentar_acoes()
   local total_acoes=0
 
   echo "****************************************** $1 ******************************************"
-  
+
   for A in ${v[*]}; do
      calcular_valores $total_somatorio_compra $total_somatorio_atual $total_acoes $A
      total_somatorio_compra=`echo $retorno | cut -d';' -f1`
      total_somatorio_atual=`echo $retorno | cut -d';' -f2`
      total_acoes=`echo $retorno | cut -d';' -f3`
   done
-  
-  imprimir_final $total_somatorio_compra $total_somatorio_atual $total_acoes  
+
+  imprimir_final $total_somatorio_compra $total_somatorio_atual $total_acoes
   echo ""
 }
 
