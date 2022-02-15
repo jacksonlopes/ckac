@@ -16,8 +16,8 @@
 # URL: https://stdsrc.net
 
 # Dependências:
-# binutils, curl, bc
-dep=(curl bc)
+# binutils, curl, bc, egrep
+dep=(curl bc egrep)
 simulacao_acao=""
 simulacao_valor=0
 
@@ -52,7 +52,10 @@ retorno=""
 
 function obter_cotacao()
 {
-  local cotacao=`curl -s $1 | grep 'strong class="value"' | head -1 | cut -d'<' -f2 | cut -d'>' -f2`
+  local cotacao=""
+  local header="'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36'"
+
+  cotacao=`curl -H $header -s $1 | egrep -e "PriceTextUp|PriceTextDown" | head -1 | cut -d'>' -f2 | cut -d'<' -f1`
   echo $cotacao | tr ',' '.'
 }
 
@@ -116,8 +119,7 @@ function calcular_apresentar_acoes()
 
   url_buscar=${!url}
   v=$(eval echo "\${${1}[*]}")
-
-  local url=`echo ${URI_PRINCIPAL}${url_buscar}`
+  local url=`echo ${URI_PRINCIPAL} | sed "s/@/${url_buscar}/g"`
 
   if [ "$1" = "$simulacao_acao" ]; then
       echo -e "\e[1m+----------------------------------\e[0m"
