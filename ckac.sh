@@ -13,7 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Author: Jackson Lopes <jacksonlopes@gmail.com>
-# URL: https://stdsrc.net
+# URL: https://stdsrc.org
 
 # Dependências:
 # binutils, curl, bc, jq
@@ -55,7 +55,7 @@ function obter_cotacao()
   local cotacao=""
   local header="'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36'"
 
-  cotacao=`curl -H $header -s $1 | jq ".quoteResponse.result[0].regularMarketPrice"`
+  cotacao=`curl -H $header -s $1 | jq ".chart.result[0].meta.regularMarketPrice"`
   echo $cotacao | tr ',' '.'
 }
 
