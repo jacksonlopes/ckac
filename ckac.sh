@@ -20,6 +20,8 @@
 dep=(curl bc jq)
 simulacao_acao=""
 simulacao_valor=0
+total_investido=0
+total_acumulado=0
 
 function verificar_parametros() {
     [ "$1" != "" -a "$2" = "" ] && {
@@ -143,8 +145,22 @@ function calcular_apresentar_acoes()
      total_acoes=`echo $retorno | cut -d';' -f3`
   done
 
+  total_investido=$(bc <<< "$total_investido + $total_somatorio_compra")
+  diferenca=$(bc <<< "$total_somatorio_atual - $total_somatorio_compra")
+  total_acumulado=$(bc <<< "$total_acumulado + $diferenca")
+
   imprimir_final $total_somatorio_compra $total_somatorio_atual $total_acoes
   echo ""
+}
+
+function imprimir_relatorio()
+{
+   local total=$(bc <<< "$total_investido + $total_acumulado")
+   echo "***************************************"
+   echo "- Total investido: $total_investido"
+   echo "- Total acumulado: $total_acumulado"
+   echo "================== $total"
+   echo "***************************************"
 }
 
 main()
@@ -154,6 +170,7 @@ main()
   for V in `grep "URL_" ckac.conf | grep "=" | cut -d'_' -f2 | cut -d'=' -f1`; do
      calcular_apresentar_acoes "$V"
   done
+  imprimir_relatorio
 }
 
 main $*
